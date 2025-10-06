@@ -4,536 +4,406 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Happy Birthday, Mummy 🎉</title>
-  <meta name="description" content="Happy Birthday website for Mummy — from Vineesh & Sudeepti" />
+  <meta name="description" content="Happy Birthday site for Mummy — from Vineesh & Sudeepti" />
   <style>
     :root{
       --bg:#fff2f7;
       --accent:#ff6fa3;
       --muted:#6b6b6b;
-      --card:#ffffffee;
-      --radius:16px;
-      --max-width:1050px;
+      --card:rgba(255,255,255,0.95);
+      --radius:14px;
+      --maxw:1100px;
     }
-    html,body{height:100%;}
+    *{box-sizing:border-box}
+    html,body{height:100%}
     body{
       margin:0;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
       background:var(--bg);
+      color:#222;
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
-      color:#222;
       overflow-x:hidden;
     }
-    /* Layout */
-    .wrap{min-height:100vh;display:flex;flex-direction:column;}
-    header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;z-index:40;position:relative;}
-    h1{margin:0;font-size:1.4rem;color:var(--accent);font-weight:800}
+
+    /* layout */
+    .wrap{min-height:100vh;display:flex;flex-direction:column;align-items:stretch}
+    header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px}
+    h1{margin:0;color:var(--accent);font-size:1.4rem;font-weight:800}
     nav{display:flex;gap:8px;flex-wrap:wrap}
-    .tab-btn{background:rgba(255,255,255,0.85);border-radius:10px;padding:8px 10px;border:1px solid rgba(0,0,0,0.06);cursor:pointer;font-weight:700}
-    .tab-btn.active{background:var(--accent);color:#fff;box-shadow:0 10px 20px rgba(255,111,160,0.12)}
-    main{flex:1;display:flex;justify-content:center;padding:12px}
-    .container{width:100%;max-width:var(--max-width);}
 
-    /* Card */
-    .card{background:var(--card);border-radius:var(--radius);box-shadow:0 12px 30px rgba(0,0,0,0.06);padding:16px;margin-bottom:16px}
+    /* tabs via radios (pure HTML) */
+    .tabs { display:flex; gap:8px; }
+    .tab-label {
+      padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.9);font-weight:700;cursor:pointer;border:1px solid rgba(0,0,0,0.06)
+    }
+    input[type="radio"] { display:none; }
 
-    /* falling emojis */
-    #emoji-falls{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:6}
-    .falling{position:absolute;top:-10vh;opacity:0.95;animation:fall linear infinite;pointer-events:none;user-select:none}
-    @keyframes fall{0%{transform:translateY(-5vh) rotate(0deg);opacity:0}10%{opacity:1}100%{transform:translateY(120vh) rotate(360deg);opacity:0}}
+    main{flex:1;display:flex;justify-content:center;padding:14px}
+    .container{width:100%;max-width:var(--maxw)}
 
-    /* canvas for fireworks */
-    canvas#fw{position:fixed;left:0;top:0;width:100%;height:100%;z-index:12;pointer-events:auto}
+    .card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:0 10px 30px rgba(0,0,0,0.06)}
 
-    /* music control */
-    .music-btn{position:fixed;right:14px;bottom:100px;z-index:46;background:white;padding:10px;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.08);display:flex;gap:8px;align-items:center}
-    .btn{cursor:pointer;padding:8px 12px;border-radius:10px;border:none;background:var(--accent);color:white;font-weight:800}
-    .btn.secondary{background:white;color:#333;border:1px solid rgba(0,0,0,0.06)}
+    /* emoji falls (pure HTML elements animated with CSS) */
+    #emoji-falls{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:5}
+    .fall{position:absolute;top:-10vh;animation:fall linear infinite;pointer-events:none;user-select:none}
+    @keyframes fall { 0%{transform:translateY(-5vh) rotate(0deg);opacity:0} 10%{opacity:1} 100%{transform:translateY(120vh) rotate(360deg);opacity:0} }
 
-    /* HOME */
-    .home-grid{display:flex;flex-direction:column;gap:14px}
-    .interactive-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center;justify-content:center}
-    .cake-wrap{display:flex;flex-direction:column;align-items:center;cursor:pointer;user-select:none}
-    .cake-caption{font-size:0.92rem;color:var(--muted);margin-top:8px}
+    /* canvas placeholder layer for visual depth (no JS fireworks) */
+    .fw-placeholder{position:fixed;left:0;top:0;width:100%;height:100%;z-index:6;pointer-events:none}
 
-    /* cake svg size */
-    #cakeSVG{max-width:260px;width:100%;height:auto;display:block}
+    /* music control area */
+    .music{position:fixed;right:14px;bottom:92px;z-index:60;background:white;padding:10px;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.08);display:flex;gap:8px;align-items:center}
 
-    .present-btn{background:white;border-radius:14px;padding:14px;display:flex;flex-direction:column;align-items:center;box-shadow:0 14px 30px rgba(0,0,0,0.06);cursor:pointer}
+    /* HOME layout */
+    .home-grid{display:flex;flex-direction:column;gap:12px}
+    .interactive-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:center}
+    .cake-wrap{display:flex;flex-direction:column;align-items:center;user-select:none}
+    .cake-caption{margin-top:10px;color:var(--muted)}
 
-    /* modal */
-    .modal{position:fixed;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:60}
-    .modal-content{width:94%;max-width:940px;background:white;border-radius:12px;padding:12px}
+    /* candle (checkbox hack) */
+    .candle-ctrl { display:none; }
+    .candle {
+      display:inline-block; cursor:pointer;
+    }
+    .flame {
+      transform-origin:center bottom;
+      transition:opacity .18s ease, transform .18s ease;
+      transform:translateY(0) scaleY(1);
+    }
+    /* when checkbox is checked -> hide flame (blown out) */
+    .candle-ctrl:checked + label .flame { opacity:0; transform:translateY(-6px) scaleY(.6); }
 
-    /* carousel */
+    .smoke {
+      display:inline-block;
+      opacity:0;
+      transform:translateY(0) scale(0.8);
+      transition:opacity .35s ease, transform .35s ease;
+    }
+    /* show a quick smoke when box checked */
+    .candle-ctrl:checked + label .smoke { opacity:1; transform:translateY(-14px) scale(1.1); }
+
+    /* present button */
+    .present { display:inline-flex;flex-direction:column;align-items:center;padding:14px;border-radius:12px;background:white;box-shadow:0 12px 30px rgba(0,0,0,0.06);cursor:pointer }
+
+    /* modal via checkbox */
+    .modal-ctrl { display:none; }
+    .modal {
+      position:fixed;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+      background:rgba(0,0,0,0.65); padding:12px; z-index:80;
+    }
+    .modal .box { background:white;border-radius:12px;padding:10px;width:100%;max-width:940px;box-shadow:0 18px 40px rgba(0,0,0,0.2) }
+
+    /* carousel: CSS-only fade slides */
     .carousel{position:relative;overflow:hidden;border-radius:12px}
-    .carousel img{width:100%;height:380px;object-fit:cover;display:block}
-    .carousel .controls{display:flex;justify-content:space-between;margin-top:8px;align-items:center}
+    .slides{position:relative;height:360px}
+    .slide{
+      position:absolute;inset:0;opacity:0;transition:opacity .8s ease;display:flex;align-items:center;justify-content:center;
+      background-size:cover;background-position:center;
+    }
+    /* animate slides using animation-delay offsets so they cycle */
+    .slide.s1{animation:fadeSlide 12s linear infinite}
+    .slide.s2{animation:fadeSlide 12s linear infinite; animation-delay:4s}
+    .slide.s3{animation:fadeSlide 12s linear infinite; animation-delay:8s}
+    @keyframes fadeSlide { 0%{opacity:0} 6%{opacity:1} 30%{opacity:1} 36%{opacity:0} 100%{opacity:0} }
 
-    /* timeline */
-    .timeline-area{display:flex;gap:12px;flex-wrap:wrap}
-    .timeline-visual{flex:1;min-width:260px;border-left:3px solid rgba(255,111,160,0.18);padding-left:14px}
-    .timeline-item{position:relative;margin-bottom:18px}
-    .timeline-item .year{position:absolute;left:-90px;top:0;background:white;padding:6px 10px;border-radius:999px;color:var(--accent);font-weight:800;box-shadow:0 6px 14px rgba(0,0,0,0.04)}
+    .carousel-controls{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
 
-    /* timeline form box */
-    .timeline-form{width:320px;min-width:260px;background:rgba(255,255,255,0.95);padding:12px;border-radius:12px;box-shadow:0 8px 18px rgba(0,0,0,0.04)}
-    input,textarea,select{width:100%;padding:10px;margin-bottom:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);font-size:1rem}
-    label.small{font-size:0.85rem;color:var(--muted);display:block;margin-bottom:6px}
+    /* timeline layout 2000-2025 */
+    .timeline-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+    .year-col{background:rgba(255,255,255,0.9);padding:10px;border-radius:10px;box-shadow:0 8px 18px rgba(0,0,0,0.04);min-height:60px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center}
+    .year-col .y {font-weight:900;color:var(--accent);font-size:1.05rem}
 
-    /* letter */
-    textarea.letter{width:100%;height:56vh;padding:12px;border-radius:12px;border:1px solid rgba(0,0,0,0.06);font-size:1rem;resize:vertical}
+    /* timeline form (non-functional) */
+    .tl-form { margin-top:10px;background:rgba(255,255,255,0.95);padding:10px;border-radius:10px;box-shadow:0 8px 18px rgba(0,0,0,0.04) }
+    .tl-form input,.tl-form textarea { width:100%;padding:8px;margin-bottom:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06); }
 
-    footer{padding:12px;text-align:center;font-size:0.92rem;color:var(--muted);z-index:46}
+    /* letter area */
+    .letter { width:100%;min-height:360px;padding:12px;border-radius:10px;border:1px solid rgba(0,0,0,0.06); }
 
-    /* responsiveness */
-    @media (min-width:900px){ .home-grid{flex-direction:row} .carousel img{height:480px} .interactive-row{justify-content:space-between} }
-    @media (max-width:520px){ h1{font-size:1.1rem} .carousel img{height:260px} .music-btn{right:10px;bottom:80px} }
+    footer{padding:12px;text-align:center;color:var(--muted);font-weight:700}
+
+    /* responsive tweaks */
+    @media(min-width:900px){ .home-grid{flex-direction:row} .slides{height:460px} .interactive-row{justify-content:space-between} }
+    @media(max-width:520px){ h1{font-size:1.1rem} .slides{height:260px} .music{right:10px;bottom:70px} }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <!-- Falling emojis -->
-    <div id="emoji-falls"></div>
 
-    <!-- fireworks canvas -->
-    <canvas id="fw"></canvas>
+    <!-- falling emojis (pure HTML) -->
+    <div id="emoji-falls" aria-hidden="true">
+      <!-- multiple static spans positioned; adjust count for density -->
+      <span class="fall" style="left:4%;font-size:28px;animation-duration:9s;animation-delay:0s">💖</span>
+      <span class="fall" style="left:18%;font-size:18px;animation-duration:7s;animation-delay:1s">😊</span>
+      <span class="fall" style="left:27%;font-size:24px;animation-duration:8s;animation-delay:2s">🤗</span>
+      <span class="fall" style="left:38%;font-size:20px;animation-duration:9s;animation-delay:0.8s">🌸</span>
+      <span class="fall" style="left:52%;font-size:22px;animation-duration:10s;animation-delay:1.5s">💖</span>
+      <span class="fall" style="left:60%;font-size:16px;animation-duration:7s;animation-delay:3s">😊</span>
+      <span class="fall" style="left:72%;font-size:26px;animation-duration:11s;animation-delay:0.3s">🤗</span>
+      <span class="fall" style="left:86%;font-size:20px;animation-duration:9s;animation-delay:2.6s">🌸</span>
+    </div>
+
+    <!-- decorative placeholder layer for fireworks space (no working fireworks without JS) -->
+    <div class="fw-placeholder" aria-hidden="true"></div>
 
     <header>
       <h1>Happy Birthday, Mummy 🎉</h1>
-      <nav id="nav">
-        <button class="tab-btn active" data-tab="home">Our Personal Message</button>
-        <button class="tab-btn" data-tab="memories">Our Memories</button>
-        <button class="tab-btn" data-tab="timeline">Timeline of Our Precious Mummy</button>
-        <button class="tab-btn" data-tab="letter">Heartfelt Letter</button>
-      </nav>
+
+      <!-- TAB NAV using radios -->
+      <div class="tabs" role="tablist" aria-label="Site sections">
+        <input type="radio" name="tab" id="tab-home" checked>
+        <label class="tab-label" for="tab-home">Our Personal Message</label>
+
+        <input type="radio" name="tab" id="tab-mem">
+        <label class="tab-label" for="tab-mem">Our Memories</label>
+
+        <input type="radio" name="tab" id="tab-tl">
+        <label class="tab-label" for="tab-tl">Timeline of Our Precious Mummy</label>
+
+        <input type="radio" name="tab" id="tab-letter">
+        <label class="tab-label" for="tab-letter">Heartfelt Letter</label>
+      </div>
     </header>
 
     <main>
       <div class="container">
-        <!-- HOME -->
-        <section id="home" class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-            <div>
-              <h2 style="margin:0;color:var(--accent)">Our Personal Message</h2>
-              <p style="margin:6px 0 0 0;color:var(--muted)">Mummy, you are our sunshine. Click anywhere to make fireworks — try the cake and the present!</p>
-            </div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <small style="color:var(--muted)">Tip: If audio doesn't autoplay, press Play</small>
-            </div>
-          </div>
 
-          <div class="home-grid" style="margin-top:14px;align-items:center">
-            <div style="flex:1;min-width:260px">
-              <div class="cake-wrap" id="cakeWrap" title="Click the cake to toggle candle">
-                <!-- Cake SVG with identifiable IDs -->
-                <svg id="cakeSVG" viewBox="0 0 260 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <g transform="translate(8,8)">
-                    <rect x="16" y="100" width="220" height="90" rx="16" fill="#ffdbe9" stroke="#ffb6d9" stroke-width="3"/>
-                    <rect x="42" y="70" width="176" height="40" rx="12" fill="#fff6f9" stroke="#ffdbe6" stroke-width="2"/>
-                    <!-- candle group -->
-                    <g id="candleGroup" style="cursor:pointer">
-                      <rect id="candleStem" x="125" y="36" width="6" height="34" rx="2" fill="#fff"/>
-                      <g id="flameGroup">
-                        <ellipse id="flameOuter" cx="128" cy="24" rx="8" ry="14" fill="#ffb74d"/>
-                        <ellipse id="flameInner" cx="128" cy="20" rx="4" ry="8" fill="#fff3b0"/>
+        <!-- HOME (visible when #tab-home checked) -->
+        <section class="card" aria-labelledby="home-title"
+                 style="display:block"
+                 >
+          <!-- CSS-only visibility: rely on :checked style in browsers where the radio is checked.
+               For clarity we keep sections visible/hidden via CSS pseudo selectors below. -->
+          <div id="home-content">
+            <h2 id="home-title" style="margin:0;color:var(--accent)">Our Personal Message</h2>
+            <p style="color:var(--muted);margin-top:6px">Mummy, you are our sunshine. Click the candle to blow it out (it will stay out). Open the present to watch the surprise video.</p>
+
+            <div class="home-grid" style="margin-top:14px;align-items:center">
+              <div style="flex:1;min-width:240px">
+                <!-- Candle uses checkbox hack: checked => flame hidden (blown out) -->
+                <input type="checkbox" id="candleBox" class="candle-ctrl" />
+                <label for="candleBox" class="candle" title="Click to blow out the candle (stays out)">
+                  <!-- Cake SVG simplified -->
+                  <svg width="260" height="240" viewBox="0 0 260 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <g transform="translate(8,8)">
+                      <rect x="16" y="100" width="220" height="90" rx="16" fill="#ffdbe9" stroke="#ffb6d9" stroke-width="3"/>
+                      <rect x="42" y="70" width="176" height="40" rx="12" fill="#fff6f9" stroke="#ffdbe6" stroke-width="2"/>
+                      <!-- candle stem -->
+                      <rect x="125" y="36" width="6" height="34" rx="2" fill="#fff"/>
+                      <!-- flame (hidden when checkbox checked) -->
+                      <g class="flame">
+                        <ellipse cx="128" cy="24" rx="8" ry="14" fill="#ffb74d"/>
+                        <ellipse cx="128" cy="20" rx="4" ry="8" fill="#fff3b0"/>
                       </g>
-                      <g id="smokeGroup" style="display:none">
+                      <!-- smoke shown when checked: use CSS sibling selector to show small emoji above -->
+                      <g class="smoke" transform="translate(0,0)">
                         <text x="112" y="26" font-size="18">💨</text>
                       </g>
                     </g>
-                  </g>
-                </svg>
-                <div class="cake-caption">Click the candle to blow it out (click again to relight)</div>
-              </div>
-            </div>
+                  </svg>
+                </label>
 
-            <div style="flex:1;min-width:260px;display:flex;flex-direction:column;align-items:center;gap:12px">
-              <div class="present-btn" id="presentBtn" title="Open present">
-                <div style="font-size:44px">🎁</div>
-                <div style="margin-top:8px;font-weight:700;color:var(--muted)">Open Present</div>
+                <div class="cake-caption">Click the cake to blow the candle out (it will stay out).</div>
               </div>
 
-              <div style="width:100%;text-align:center;margin-top:6px;">
-                <small style="color:var(--accent);font-weight:700">With love from Vineesh and Sudeepti</small>
+              <div style="flex:1;min-width:240px;display:flex;flex-direction:column;align-items:center;gap:12px">
+                <!-- Present: uses checkbox to toggle modal open (pure HTML) -->
+                <input type="checkbox" id="presentBox" class="modal-ctrl" />
+                <label for="presentBox" class="present" title="Open present — plays your uploaded present.mp4">
+                  <div style="font-size:46px">🎁</div>
+                  <div style="margin-top:8px;font-weight:700;color:var(--muted)">Open Present</div>
+                </label>
+
+                <div style="width:100%;text-align:center;margin-top:6px;color:var(--accent);font-weight:700">With love from Vineesh and Sudeepti</div>
               </div>
             </div>
           </div>
         </section>
 
         <!-- MEMORIES -->
-        <section id="memories" class="card" style="display:none">
-          <h2 style="color:var(--accent);margin:0 0 8px 0;">Our Memories</h2>
-          <p style="margin:0;color:var(--muted)">A carousel of our favourite moments — replace sample images later in your repo's images/ folder.</p>
+        <section class="card" aria-labelledby="mem-title" style="display:block;margin-top:14px">
+          <h2 id="mem-title" style="margin:0;color:var(--accent)">Our Memories</h2>
+          <p style="color:var(--muted);margin-top:6px">A simple CSS carousel that auto-fades through three sample images (replace with /images/memory1.jpg etc.).</p>
 
-          <div class="carousel" style="margin-top:12px;">
-            <div id="slides" style="position:relative">
-              <img id="slideImg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='700'><rect width='100%' height='100%' fill='%23ffdfe9'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='60' fill='%23ff6fa3'>Memory%201</text></svg>" alt="memory"/>
+          <div class="carousel" style="margin-top:12px">
+            <div class="slides">
+              <div class="slide s1" style="background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%221200%22 height=%22700%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23ffdfe9%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2260%22 fill=%22%23ff6fa3%22>Memory%201</text></svg>');"></div>
+              <div class="slide s2" style="background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%221200%22 height=%22700%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23fff0f0%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2260%22 fill=%22%23ff8fbf%22>Memory%202</text></svg>');"></div>
+              <div class="slide s3" style="background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%221200%22 height=%22700%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23fff9f0%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2260%22 fill=%22%23ff6f9f%22>Memory%203</text></svg>');"></div>
             </div>
 
-            <div class="controls" style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
-              <button id="prev" class="btn secondary">Prev</button>
-              <div style="color:var(--muted)" id="slideIndex">1 / 3</div>
-              <button id="next" class="btn">Next</button>
+            <div class="carousel-controls">
+              <div style="color:var(--muted)">Auto-playing carousel — replace slides with images/memory1.jpg etc.</div>
+              <div style="color:var(--muted);font-weight:700">1 / 3</div>
             </div>
           </div>
 
-          <div style="margin-top:12px;text-align:right">
-            <small style="color:var(--accent);font-weight:700">With love from Vineesh and Sudeepti</small>
-          </div>
+          <div style="margin-top:12px;text-align:right;color:var(--accent);font-weight:700">With love from Vineesh and Sudeepti</div>
         </section>
 
-        <!-- TIMELINE -->
-        <section id="timeline" class="card" style="display:none">
-          <h2 style="color:var(--accent);margin:0 0 8px 0;">Timeline of Our Precious Mummy</h2>
-          <div style="display:flex;gap:12px;flex-wrap:wrap">
-            <div class="timeline-visual" id="timelineVisual" style="min-height:220px;padding-top:8px">
-              <!-- timeline entries injected here -->
+        <!-- TIMELINE (2000-2025) -->
+        <section class="card" aria-labelledby="tl-title" style="display:block;margin-top:14px">
+          <h2 id="tl-title" style="margin:0;color:var(--accent)">Timeline of Our Precious Mummy</h2>
+          <p style="color:var(--muted);margin-top:6px">Years 2000 — 2025 are shown below. Use the form to type a new moment (form is non-functional in this HTML-only version).</p>
+
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px">
+            <div style="flex:1;min-width:240px">
+              <div class="timeline-grid">
+                <!-- create year tiles 2000-2025 -->
+                <!-- we'll show decade blocks; you can replace static content with images/text later -->
+                <!-- Year columns -->
+                <!-- Keep the layout simple and readable -->
+                <!-- Generate HTML for each year -->
+                <!-- NOTE: this is static — purely presentational -->
+                <!-- I'll show every 4 years per row visually via the grid -->
+                <!-- Insert year tiles manually -->
+                <div class="year-col"><div class="y">2000</div><div style="color:var(--muted);margin-top:6px">Start of timeline</div></div>
+                <div class="year-col"><div class="y">2001</div></div>
+                <div class="year-col"><div class="y">2002</div></div>
+                <div class="year-col"><div class="y">2003</div></div>
+
+                <div class="year-col"><div class="y">2004</div></div>
+                <div class="year-col"><div class="y">2005</div></div>
+                <div class="year-col"><div class="y">2006</div></div>
+                <div class="year-col"><div class="y">2007</div></div>
+
+                <div class="year-col"><div class="y">2008</div></div>
+                <div class="year-col"><div class="y">2009</div></div>
+                <div class="year-col"><div class="y">2010</div></div>
+                <div class="year-col"><div class="y">2011</div></div>
+
+                <div class="year-col"><div class="y">2012</div></div>
+                <div class="year-col"><div class="y">2013</div></div>
+                <div class="year-col"><div class="y">2014</div></div>
+                <div class="year-col"><div class="y">2015</div></div>
+
+                <div class="year-col"><div class="y">2016</div></div>
+                <div class="year-col"><div class="y">2017</div></div>
+                <div class="year-col"><div class="y">2018</div></div>
+                <div class="year-col"><div class="y">2019</div></div>
+
+                <div class="year-col"><div class="y">2020</div></div>
+                <div class="year-col"><div class="y">2021</div></div>
+                <div class="year-col"><div class="y">2022</div></div>
+                <div class="year-col"><div class="y">2023</div></div>
+
+                <div class="year-col"><div class="y">2024</div></div>
+                <div class="year-col"><div class="y">2025</div></div>
+              </div>
             </div>
 
-            <div class="timeline-form">
-              <div style="margin-bottom:8px"><strong>Add a timeline moment</strong></div>
-              <form id="timelineForm">
-                <label class="small">Year (2000 - 2025)</label>
-                <select name="year" id="yearSelect" required>
-                  <!-- years injected by JS -->
-                </select>
-                <input name="title" placeholder="Title (e.g., Graduation)" required />
-                <input name="image" placeholder="Image URL (optional) e.g. images/memory1.jpg" />
-                <textarea name="note" placeholder="Short note" rows="4"></textarea>
-                <div style="display:flex;gap:8px;margin-top:8px">
-                  <button class="btn" type="submit">Add</button>
-                  <button class="btn secondary" type="button" id="clearTimelineBtn">Clear All</button>
-                </div>
-              </form>
-              <div style="margin-top:10px;color:var(--muted);font-size:0.92rem">Timeline years run from 2000 through 2025. Added items are saved in your browser (localStorage).</div>
+            <!-- non-functional typable form -->
+            <div style="width:320px;min-width:240px">
+              <div class="tl-form">
+                <strong>Add a timeline moment</strong>
+                <form action="#" method="post" onsubmit="return false">
+                  <label style="display:block;font-size:0.9rem;color:var(--muted);margin-top:8px">Year (2000 - 2025)</label>
+                  <select name="year" style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06)">
+                    <!-- options 2000..2025 -->
+                    <option>2000</option><option>2001</option><option>2002</option><option>2003</option>
+                    <option>2004</option><option>2005</option><option>2006</option><option>2007</option>
+                    <option>2008</option><option>2009</option><option>2010</option><option>2011</option>
+                    <option>2012</option><option>2013</option><option>2014</option><option>2015</option>
+                    <option>2016</option><option>2017</option><option>2018</option><option>2019</option>
+                    <option>2020</option><option>2021</option><option>2022</option><option>2023</option>
+                    <option>2024</option><option>2025</option>
+                  </select>
+
+                  <input name="title" placeholder="Title (e.g. Graduation)" />
+                  <input name="image" placeholder="Image URL (optional)" />
+                  <textarea name="note" placeholder="Short note" rows="4"></textarea>
+
+                  <div style="display:flex;gap:8px">
+                    <button class="btn" type="button">Save (non-functional)</button>
+                    <button class="btn secondary" type="reset">Clear</button>
+                  </div>
+                </form>
+                <small style="color:var(--muted);display:block;margin-top:8px">This form is typable but non-functional (no JS).</small>
+              </div>
             </div>
           </div>
 
-          <div style="margin-top:8px;text-align:right">
-            <small style="color:var(--accent);font-weight:700">With love from Vineesh and Sudeepti</small>
-          </div>
+          <div style="margin-top:12px;text-align:right;color:var(--accent);font-weight:700">With love from Vineesh and Sudeepti</div>
         </section>
 
-        <!-- LETTER -->
-        <section id="letter" class="card" style="display:none">
-          <h2 style="color:var(--accent);margin:0 0 8px 0;">Heartfelt Letter</h2>
-          <p style="margin:0 0 10px 0;color:var(--muted)">Write a long thoughtful letter for Mummy. Use Copy or Download when done.</p>
-          <textarea id="letterBox" class="letter">Dear Mummy,
+        <!-- HEARTFELT LETTER -->
+        <section class="card" style="display:block;margin-top:14px">
+          <h2 style="margin:0;color:var(--accent)">Heartfelt Letter</h2>
+          <p style="color:var(--muted);margin-top:6px">Write a long letter below (copy & download require JS; in this HTML-only version you can select and copy).</p>
+          <textarea class="letter">Dear Mummy,
 
-Happy Birthday! We love you so much. Thank you for your love, care and all the small things you do. Today we celebrate you and your beautiful heart. ...</textarea>
+Happy Birthday! We love you so much. Thank you for your warmth, care and all the little things you do every day. Today we celebrate you.
 
-          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-            <button class="btn secondary" id="copyLetterBtn">Copy</button>
-            <button class="btn" id="downloadLetterBtn">Download</button>
-          </div>
+With love,
+Vineesh and Sudeepti</textarea>
 
-          <div style="margin-top:12px;text-align:right">
-            <small style="color:var(--accent);font-weight:700">With love from Vineesh and Sudeepti</small>
-          </div>
+          <div style="margin-top:12px;text-align:right;color:var(--accent);font-weight:700">With love from Vineesh and Sudeepti</div>
         </section>
+
       </div>
     </main>
 
-    <!-- Present modal -->
-    <div id="presentModal" class="modal" style="display:none">
-      <div class="modal-content">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <h3 style="margin:0;color:var(--accent)">A Surprise for Mummy</h3>
-          <div>
-            <button id="closePresentBtn" class="btn secondary">Close</button>
+    <!-- modal: controlled by checkbox #presentBox -->
+    <div>
+      <!-- modal visible when #presentBox is checked (checkbox is in the Home section label) -->
+      <style>
+        /* show modal when checkbox checked */
+        #presentBox:checked ~ .present-modal { display:flex; }
+        .present-modal { display:none; position:fixed;left:0;top:0;width:100%;height:100%;align-items:center;justify-content:center;background:rgba(0,0,0,0.65);z-index:90;padding:12px }
+        .present-modal .box{background:white;border-radius:12px;padding:12px;width:100%;max-width:940px;box-shadow:0 20px 48px rgba(0,0,0,0.25)}
+        .present-modal .close { display:inline-block;margin-left:8px;padding:6px 10px;border-radius:8px;background:#f5f5f5;border:1px solid rgba(0,0,0,0.06);cursor:pointer }
+      </style>
+
+      <div class="present-modal" aria-hidden="true">
+        <div class="box">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <h3 style="margin:0;color:var(--accent)">A Surprise for Mummy</h3>
+            <!-- label toggles the checkbox off to close modal -->
+            <label for="presentBox" class="close">Close</label>
           </div>
+          <!-- Use your uploaded present.mp4 in the same folder as index.html -->
+          <video controls style="width:100%;border-radius:8px" playsinline>
+            <source src="present.mp4" type="video/mp4">
+            Your browser does not support HTML5 video.
+          </video>
         </div>
-        <!-- use present.mp4 in same folder as index.html -->
-        <video id="presentVideo" controls style="width:100%;border-radius:8px" playsinline>
-          <source src="present.mp4" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
       </div>
     </div>
 
-    <!-- footer -->
     <footer>Made with ❤️ for Mummy — Vineesh & Sudeepti</footer>
 
-    <!-- music control -->
-    <div class="music-btn" id="musicControl">
-      <audio id="bgAudio" src="bday-music.mp3" loop preload="auto"></audio>
-      <button id="toggleMusic" class="btn">Play Music</button>
-      <button id="muteMusic" class="btn secondary">Mute</button>
+    <!-- music player (pure HTML) -->
+    <div class="music">
+      <audio controls loop preload="auto" style="outline:none">
+        <!-- Upload a Happy Birthday song named bday-music.mp3 in same folder as index.html -->
+        <source src="bday-music.mp3" type="audio/mpeg">
+        Your browser does not support audio playback.
+      </audio>
+      <div style="font-size:0.9rem;color:var(--muted);font-weight:700">Background music</div>
     </div>
+
+    <!-- CSS to connect visibility of main sections to radios (pure CSS tabs) -->
+    <style>
+      /* hide all main <section.card> by default, then show the one matching the checked radio */
+      /* We'll use the fact that radios are before main in DOM; use general sibling selectors */
+      /* Note: ordering is header (radios), then main. We'll hide/show internal blocks by ID using :checked ~ main ... */
+      /* This technique requires the radios to be before the main content (they are in header). */
+      #tab-home:checked ~ main .container section.card { display:none; }
+      /* show only the first section when home checked (we rely on DOM order: there are 4 sections; we show them by index) */
+      #tab-home:checked ~ main .container > section:nth-of-type(1) { display:block; }
+      #tab-mem:checked ~ main .container section.card { display:none; }
+      #tab-mem:checked ~ main .container > section:nth-of-type(2) { display:block; }
+      #tab-tl:checked ~ main .container section.card { display:none; }
+      #tab-tl:checked ~ main .container > section:nth-of-type(3) { display:block; }
+      #tab-letter:checked ~ main .container section.card { display:none; }
+      #tab-letter:checked ~ main .container > section:nth-of-type(4) { display:block; }
+
+      /* Show candle smoke/flame control via checkbox sibling selector (already used) */
+      /* The candle checkbox is inside the Home section; we target the SVG group via CSS inlined above */
+      /* NOTE: browser behavior: the smoke element is present and will show when box checked due to the earlier rules. */
+    </style>
+
   </div>
-
-  <script>
-    /* ----------------------------
-       Helper & Initialization
-       ---------------------------- */
-    (function(){
-      // Falling emojis
-      const container = document.getElementById('emoji-falls');
-      const emojis = ['💖','😊','🤗','🤍','🌸'];
-      const count = 18;
-      for(let i=0;i<count;i++){
-        const el = document.createElement('div');
-        el.className = 'falling';
-        el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-        el.style.left = (Math.random()*100) + '%';
-        el.style.fontSize = (12 + Math.random()*32) + 'px';
-        el.style.animationDuration = (6 + Math.random()*8) + 's';
-        el.style.animationDelay = (Math.random()*5)+'s';
-        container.appendChild(el);
-      }
-
-      // Tabs
-      const tabs = document.querySelectorAll('.tab-btn');
-      const sections = { home:document.getElementById('home'), memories:document.getElementById('memories'), timeline:document.getElementById('timeline'), letter:document.getElementById('letter') };
-      function show(tab){
-        tabs.forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-        Object.keys(sections).forEach(k => sections[k].style.display = (k===tab) ? 'block' : 'none');
-        // ensure canvas is clickable for fireworks only on home? we allow global clicks
-      }
-      tabs.forEach(b => b.addEventListener('click', ()=> show(b.dataset.tab)));
-      show('home');
-
-      // Canvas fireworks
-      const canvas = document.getElementById('fw');
-      const ctx = canvas.getContext('2d');
-      let W = canvas.width = innerWidth;
-      let H = canvas.height = innerHeight;
-      window.addEventListener('resize', ()=>{ W=canvas.width=innerWidth; H=canvas.height=innerHeight; });
-
-      const particles = [];
-      function rnd(min,max){ return Math.random()*(max-min)+min; }
-      function explode(x,y){
-        const colors = ['#ff6fa3','#ffd166','#7afcff','#b28dff','#8cffb3'];
-        const count = 26;
-        for(let i=0;i<count;i++){
-          const angle = Math.random()*Math.PI*2;
-          const speed = rnd(1.5,6.5);
-          particles.push({
-            x,y,
-            vx:Math.cos(angle)*speed,
-            vy:Math.sin(angle)*speed,
-            life: Math.floor(rnd(40,110)),
-            color: colors[Math.floor(Math.random()*colors.length)],
-            r: rnd(1.8,3.8)
-          });
-        }
-      }
-      function loop(){
-        ctx.clearRect(0,0,W,H);
-        for(let i=particles.length-1;i>=0;i--){
-          const p=particles[i];
-          p.x += p.vx; p.y += p.vy;
-          p.vy += 0.06; p.vx *= 0.998;
-          p.life--;
-          ctx.globalAlpha = Math.max(p.life/100,0);
-          ctx.fillStyle = p.color;
-          ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
-          if(p.life<=0) particles.splice(i,1);
-        }
-        requestAnimationFrame(loop);
-      }
-      loop();
-      // click to create fireworks
-      canvas.addEventListener('click', (e)=> {
-        const rect = canvas.getBoundingClientRect();
-        explode(e.clientX - rect.left, e.clientY - rect.top);
-      });
-
-      /* --------------- Cake Candle (toggle blow out / relight) --------------- */
-      (function(){
-        const candleGroup = document.getElementById('candleGroup');
-        const flameGroup = document.getElementById('flameGroup');
-        const smokeGroup = document.getElementById('smokeGroup');
-        let lit = true;
-        // initial: flame visible
-        flameGroup.style.display = 'block';
-        smokeGroup.style.display = 'none';
-        candleGroup.addEventListener('click', ()=>{
-          if(lit){
-            // blow out: show smoke briefly then hide flame
-            smokeGroup.style.display = 'block';
-            flameGroup.style.display = 'none';
-            // hide smoke after 900ms
-            setTimeout(()=> { smokeGroup.style.display = 'none'; }, 900);
-            lit = false;
-          } else {
-            // relight
-            flameGroup.style.display = 'block';
-            smokeGroup.style.display = 'none';
-            lit = true;
-          }
-        });
-      })();
-
-      /* --------------- Present modal & video --------------- */
-      (function(){
-        const presentBtn = document.getElementById('presentBtn');
-        const modal = document.getElementById('presentModal');
-        const closeBtn = document.getElementById('closePresentBtn');
-        const video = document.getElementById('presentVideo');
-
-        presentBtn.addEventListener('click', ()=> {
-          modal.style.display = 'flex';
-          try{ video.currentTime = 0; video.play().catch(()=>{}); }catch(e){}
-        });
-        closeBtn.addEventListener('click', ()=> {
-          try{ video.pause(); }catch(e){}
-          modal.style.display = 'none';
-        });
-        modal.addEventListener('click', (ev)=> {
-          if(ev.target === modal){ try{ video.pause(); }catch(e){} modal.style.display = 'none'; }
-        });
-      })();
-
-      /* --------------- Music controls --------------- */
-      (function(){
-        const audio = document.getElementById('bgAudio');
-        const toggle = document.getElementById('toggleMusic');
-        const mute = document.getElementById('muteMusic');
-        let playing = false;
-        toggle.addEventListener('click', ()=> {
-          if(!playing){ audio.play().catch(()=>{}); toggle.textContent='Pause Music'; playing=true; }
-          else { audio.pause(); toggle.textContent='Play Music'; playing=false; }
-        });
-        mute.addEventListener('click', ()=> {
-          audio.muted = !audio.muted;
-          mute.textContent = audio.muted ? 'Unmute' : 'Mute';
-        });
-        audio.addEventListener('play', ()=> { toggle.textContent='Pause Music'; playing=true; });
-        audio.addEventListener('pause', ()=> { toggle.textContent='Play Music'; playing=false; });
-      })();
-
-      /* --------------- Carousel (memories) --------------- */
-      (function(){
-        // Default three sample slides (data URLs). Replace slideUrls with your actual /images/... later.
-        const slideUrls = [
-          "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='700'><rect width='100%' height='100%' fill='%23ffdfe9'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='60' fill='%23ff6fa3'>Memory%201</text></svg>",
-          "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='700'><rect width='100%' height='100%' fill='%23fff0f0'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='60' fill='%23ff8fbf'>Memory%202</text></svg>",
-          "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='700'><rect width='100%' height='100%' fill='%23fff9f0'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='60' fill='%23ff6f9f'>Memory%203</text></svg>"
-        ];
-        let idx = 0;
-        const img = document.getElementById('slideImg');
-        const label = document.getElementById('slideIndex');
-        function show(i){
-          idx = ((i%slideUrls.length)+slideUrls.length)%slideUrls.length;
-          img.src = slideUrls[idx];
-          label.textContent = (idx+1) + ' / ' + slideUrls.length;
-        }
-        document.getElementById('prev').addEventListener('click', ()=> show(idx-1));
-        document.getElementById('next').addEventListener('click', ()=> show(idx+1));
-        setInterval(()=> show(idx+1), 4200);
-        show(0);
-      })();
-
-      /* --------------- Timeline (years 2000-2025, add via form) --------------- */
-      (function(){
-        const storageKey = 'mummy_timeline_2000_2025';
-        const visual = document.getElementById('timelineVisual');
-        const form = document.getElementById('timelineForm');
-        const yearSelect = document.getElementById('yearSelect');
-        const clearBtn = document.getElementById('clearTimelineBtn');
-
-        // populate year select 2000..2025
-        for(let y=2000;y<=2025;y++){
-          const opt = document.createElement('option');
-          opt.value = y; opt.textContent = y;
-          yearSelect.appendChild(opt);
-        }
-
-        function load(){
-          const raw = localStorage.getItem(storageKey);
-          const arr = raw ? JSON.parse(raw) : [
-            {year:2001,title:'First Smile',note:'A sweet memory',image:''},
-            {year:2015,title:'Big Moment',note:'A proud day',image:''}
-          ];
-          render(arr);
-        }
-        function save(arr){ localStorage.setItem(storageKey, JSON.stringify(arr)); }
-        function render(arr){
-          visual.innerHTML = '';
-          arr.sort((a,b)=> a.year - b.year);
-          if(arr.length === 0){
-            visual.innerHTML = '<div style="color:var(--muted)">No moments yet — add some using the form.</div>';
-            return;
-          }
-          arr.forEach((it, idx)=>{
-            const node = document.createElement('div');
-            node.className = 'timeline-item';
-            node.innerHTML = `
-              <div class="year">${it.year}</div>
-              <div style="margin-left:18px;padding:8px;border-radius:10px;background:rgba(255,255,255,0.95);box-shadow:0 8px 18px rgba(0,0,0,0.04)">
-                <div style="font-weight:800;color:var(--accent)">${escapeHtml(it.title)}</div>
-                <div style="color:var(--muted);margin-top:6px">${escapeHtml(it.note)}</div>
-                ${it.image ? `<img src="${escapeAttr(it.image)}" style="margin-top:8px;border-radius:8px;max-width:240px;display:block" />` : ''}
-                <div style="margin-top:8px"><button data-index="${idx}" class="btn secondary removeBtn">Remove</button></div>
-              </div>
-            `;
-            visual.appendChild(node);
-          });
-          // wire remove buttons
-          visual.querySelectorAll('.removeBtn').forEach(btn=>{
-            btn.addEventListener('click', ()=>{
-              const i = parseInt(btn.dataset.index,10);
-              const arr = JSON.parse(localStorage.getItem(storageKey) || '[]');
-              arr.splice(i,1);
-              save(arr);
-              load();
-            });
-          });
-        }
-
-        form.addEventListener('submit', (e)=>{
-          e.preventDefault();
-          const fd = new FormData(form);
-          const year = Number(fd.get('year'));
-          if(isNaN(year) || year < 2000 || year > 2025){
-            alert('Please choose a year between 2000 and 2025.');
-            return;
-          }
-          const obj = { year: year, title: (fd.get('title')||'').trim(), image: (fd.get('image')||'').trim(), note: (fd.get('note')||'').trim() };
-          if(!obj.title){ alert('Please provide a title.'); return; }
-          const arr = JSON.parse(localStorage.getItem(storageKey) || '[]');
-          arr.push(obj);
-          save(arr);
-          form.reset();
-          load();
-          // switch to timeline tab view if needed
-        });
-
-        clearBtn.addEventListener('click', ()=>{
-          if(confirm('Clear all saved timeline moments?')){ localStorage.removeItem(storageKey); load(); }
-        });
-
-        // helpers
-        function escapeHtml(s){ return (s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'); }
-        function escapeAttr(s){ return (s||'').replaceAll('"','&quot;'); }
-
-        load();
-      })();
-
-      /* --------------- Letter copy & download --------------- */
-      (function(){
-        const copyBtn = document.getElementById('copyLetterBtn');
-        const downloadBtn = document.getElementById('downloadLetterBtn');
-        const box = document.getElementById('letterBox');
-        copyBtn.addEventListener('click', ()=> {
-          navigator.clipboard.writeText(box.value).then(()=> alert('Letter copied to clipboard'));
-        });
-        downloadBtn.addEventListener('click', ()=> {
-          const blob = new Blob([box.value],{type:'text/plain'});
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url; a.download = 'letter-to-mum.txt'; a.click();
-          URL.revokeObjectURL(url);
-        });
-      })();
-
-      /* small keyboard shortcut: M toggles music */
-      document.addEventListener('keydown', (e)=> { if(e.key.toLowerCase()==='m'){ document.getElementById('toggleMusic').click(); } });
-
-      // End init
-    })();
-  </script>
 </body>
 </html>
